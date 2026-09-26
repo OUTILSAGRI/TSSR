@@ -199,8 +199,15 @@ function displayFolders() {
 function openFile(encodedName) {
   const name = decodeURIComponent(encodedName);
 
+  // Ouvre directement le fichier brut depuis GitHub.
+  // Pour un PDF, le navigateur utilise alors son lecteur PDF intégré.
+  const filePath = name
+    .split("/")
+    .map(part => encodeURIComponent(part))
+    .join("/");
+
   const url =
-    `https://github.com/${owner}/${repo}/blob/main/${encodeURIComponent(name)}`;
+    `https://raw.githubusercontent.com/${owner}/${repo}/main/${filePath}`;
 
   window.open(url, "_blank");
 }
