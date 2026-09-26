@@ -1,1042 +1,249 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#f5f4ee">
-  <title>Mon espace de travail</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mes fichiers</title>
   <style>
-    :root {
-      color-scheme: light;
-      --ink: #182b25;
-      --muted: #68756f;
-      --paper: #f5f4ee;
-      --white: #fffefa;
-      --green: #174d3c;
-      --mint: #dcebe0;
-      --coral: #d76d52;
-      --yellow: #f0c970;
-      --line: #e5e5dc;
-      font-family: "Avenir Next", Avenir, "Segoe UI", sans-serif;
-      font-synthesis: none;
-      text-rendering: optimizeLegibility;
-    }
-
-    * { box-sizing: border-box; }
-    [hidden] { display: none !important; }
-
     body {
-      min-width: 320px;
-      min-height: 100vh;
-      margin: 0;
-      color: var(--ink);
-      background:
-        radial-gradient(ellipse at 88% 8%, rgba(240, 201, 112, .20), transparent 24rem),
-        radial-gradient(ellipse at 0% 65%, rgba(220, 235, 224, .58), transparent 26rem),
-        var(--paper);
+      font-family: Arial, sans-serif;
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 0 20px;
+      color: #222;
+      background: #fafafa;
     }
 
-    button, input { font: inherit; }
-    button { color: inherit; }
+    h1 { margin-bottom: 8px; }
+    p { color: #666; }
 
-    .topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 24px;
-      max-width: 1160px;
-      margin: 0 auto;
-      padding: 26px 32px;
-      border-bottom: 1px solid rgba(24, 43, 37, .1);
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 11px;
-      color: var(--green);
-      font-size: 15px;
-      font-weight: 750;
-    }
-
-    .brand-mark {
-      display: grid;
-      width: 34px;
-      height: 34px;
-      place-items: center;
-      border-radius: 11px;
-      color: var(--white);
-      background: var(--green);
-    }
-
-    .brand-mark svg { width: 19px; height: 19px; }
-
-    .menu-wrap { position: relative; }
-
-    .menu-trigger {
-      display: inline-flex;
-      min-height: 42px;
-      align-items: center;
-      gap: 10px;
-      padding: 0 14px;
-      border: 1px solid #d9ddd5;
-      border-radius: 8px;
-      background: var(--white);
-      cursor: pointer;
-      font-size: 14px;
-      font-weight: 650;
-    }
-
-    .menu-trigger:hover, .menu-trigger[aria-expanded="true"] { border-color: var(--green); }
-    .menu-trigger svg { width: 16px; height: 16px; }
-    .menu-trigger .chevron { transition: transform .18s ease; }
-    .menu-trigger[aria-expanded="true"] .chevron { transform: rotate(180deg); }
-
-    .menu-popover {
-      position: absolute;
-      z-index: 2;
-      top: calc(100% + 8px);
-      right: 0;
-      width: 210px;
-      padding: 6px;
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      background: var(--white);
-      box-shadow: 0 14px 34px rgba(24, 43, 37, .13);
-    }
-
-    .menu-popover[hidden] { display: none; }
-
-    .menu-option {
-      display: flex;
-      width: 100%;
-      min-height: 42px;
-      align-items: center;
-      gap: 10px;
-      padding: 0 10px;
-      border: 0;
+    button {
+      padding: 8px 12px;
+      border: 1px solid #ccc;
       border-radius: 6px;
-      background: transparent;
+      background: white;
       cursor: pointer;
-      text-align: left;
-      font-size: 14px;
     }
 
-    .menu-option:hover, .menu-option[aria-current="page"] { color: var(--green); background: #edf3ed; }
-    .menu-option svg { width: 17px; height: 17px; }
+    button:hover { background: #f0f0f0; }
 
-    main {
-      max-width: 1160px;
-      margin: 0 auto;
-      padding: 66px 32px 80px;
-      animation: appear .45s ease both;
-    }
-
-    .eyebrow {
-      margin: 0 0 14px;
-      color: var(--coral);
-      font-size: 12px;
-      font-weight: 800;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-    }
-
-    h1 {
-      max-width: 660px;
-      margin: 0;
-      font-family: Georgia, "Times New Roman", serif;
-      font-size: 48px;
-      font-weight: 500;
-      line-height: 1.08;
-    }
-
-    .intro {
-      max-width: 520px;
-      margin: 16px 0 0;
-      color: var(--muted);
-      font-size: 16px;
-      line-height: 1.6;
-    }
-
-    .section-head {
+    .file {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 18px;
-      margin: 48px 0 18px;
+      gap: 15px;
+      padding: 12px;
+      margin: 8px 0;
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 6px;
     }
 
-    h2 { margin: 0; font-size: 17px; font-weight: 750; }
-
-    .folder-count { margin-left: 8px; color: var(--muted); font-size: 13px; font-weight: 500; }
-
-    .add-button {
-      display: inline-flex;
-      min-height: 42px;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      padding: 0 14px;
-      border: 0;
-      border-radius: 7px;
-      color: white;
-      background: var(--green);
-      cursor: pointer;
-      font-size: 13px;
-      font-weight: 700;
-      transition: background .18s ease, transform .18s ease;
-    }
-
-    .add-button:hover { transform: translateY(-1px); background: #103d30; }
-    .add-button svg { width: 16px; height: 16px; }
-
-    .folder-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 14px;
-    }
-
-    .folder-card {
-      position: relative;
-      display: flex;
-      min-height: 150px;
-      flex-direction: column;
-      justify-content: space-between;
-      padding: 19px;
-      border: 1px solid var(--line);
-      border-radius: 9px;
-      background: var(--white);
-      animation: appear .3s ease both;
-    }
-
-    .folder-icon {
-      display: grid;
-      width: 42px;
-      height: 42px;
-      place-items: center;
-      border-radius: 12px;
-      color: var(--green);
-      background: var(--mint);
-    }
-
-    .folder-icon svg { width: 22px; height: 22px; }
-    .folder-card:nth-child(3n + 2) .folder-icon { color: #a34e38; background: #f8e6df; }
-    .folder-card:nth-child(3n) .folder-icon { color: #755815; background: #fbf0d3; }
-
-    .folder-name {
+    .file-name {
       overflow-wrap: anywhere;
-      margin: 16px 0 4px;
-      font-size: 15px;
-      font-weight: 700;
     }
 
-    .folder-meta { margin: 0; color: var(--muted); font-size: 12px; }
-
-    .delete-folder {
-      position: absolute;
-      top: 14px;
-      right: 14px;
-      display: grid;
-      width: 32px;
-      height: 32px;
-      place-items: center;
-      border: 0;
-      border-radius: 6px;
-      color: #7b8580;
-      background: transparent;
-      cursor: pointer;
-      opacity: 0;
-      transition: opacity .15s ease, background .15s ease;
-    }
-
-    .folder-card:hover .delete-folder, .delete-folder:focus-visible { opacity: 1; }
-    .delete-folder:hover { color: #a13f32; background: #f8e6df; }
-    .delete-folder svg { width: 16px; height: 16px; }
-
-    .empty-state {
-      padding: 34px 20px;
-      border: 1px dashed #c8d0c8;
-      border-radius: 9px;
-      color: var(--muted);
-      background: rgba(255, 254, 250, .55);
-      font-size: 14px;
-      text-align: center;
-    }
-
-    .resource {
+    .actions {
       display: flex;
-      align-items: center;
-      gap: 14px;
-      max-width: 500px;
-      margin-top: 34px;
-      padding: 15px 17px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: rgba(255, 254, 250, .76);
+      gap: 6px;
+      flex-shrink: 0;
     }
 
-    .resource-icon {
-      display: grid;
-      width: 38px;
-      height: 38px;
-      flex: 0 0 auto;
-      place-items: center;
-      border-radius: 8px;
-      color: #a34e38;
-      background: #f8e6df;
+    .folders {
+      margin: 25px 0;
+      padding: 15px;
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 6px;
     }
 
-    .resource-icon svg { width: 19px; height: 19px; }
-    .resource-copy { min-width: 0; flex: 1; }
-    .resource-copy strong { display: block; overflow-wrap: anywhere; font-size: 13px; }
-    .resource-copy span { display: block; margin-top: 4px; color: var(--muted); font-size: 12px; }
-    .resource a { color: var(--green); font-size: 13px; font-weight: 700; text-decoration: none; }
-    .resource a:hover { text-decoration: underline; }
-    .resource-link { color: var(--green); font-size: 13px; font-weight: 700; white-space: nowrap; }
-
-    dialog {
-      width: min(420px, calc(100% - 32px));
-      padding: 26px;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      color: var(--ink);
-      background: var(--white);
-      box-shadow: 0 24px 70px rgba(24, 43, 37, .2);
+    .folder {
+      display: inline-block;
+      margin: 5px;
     }
 
-    dialog::backdrop { background: rgba(19, 36, 30, .42); backdrop-filter: blur(3px); }
-    dialog h2 { font-family: Georgia, "Times New Roman", serif; font-size: 25px; font-weight: 500; }
-    dialog p { margin: 9px 0 20px; color: var(--muted); font-size: 14px; line-height: 1.5; }
-    .field-label { display: block; margin-bottom: 7px; font-size: 13px; font-weight: 700; }
-    .folder-input { width: 100%; height: 44px; padding: 0 11px; border: 1px solid #cfd6ce; border-radius: 6px; outline-color: var(--green); }
-    .dialog-actions { display: flex; justify-content: flex-end; gap: 9px; margin-top: 20px; }
-    .dialog-actions button { min-height: 40px; padding: 0 13px; border: 1px solid var(--line); border-radius: 6px; background: white; cursor: pointer; font-size: 13px; font-weight: 650; }
-    .dialog-actions .confirm { border-color: var(--green); color: white; background: var(--green); }
-
-
-    .project-bar {
-      display:flex; align-items:center; gap:12px; flex-wrap:wrap;
-      margin-top:30px; padding:14px 16px; border:1px solid var(--line);
-      border-radius:9px; background:rgba(255,254,250,.78);
-    }
-    .project-status { flex:1; min-width:220px; color:var(--muted); font-size:13px; }
-    .project-status strong { color:var(--ink); }
-    .pdf-section { margin-top:44px; }
-    .pdf-head { display:flex; align-items:center; justify-content:space-between; gap:18px; margin-bottom:18px; }
-    .pdf-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; }
-    .pdf-card {
-      position:relative; display:flex; flex-direction:column; min-height:150px;
-      padding:18px; border:1px solid var(--line); border-radius:9px; background:var(--white);
-    }
-    .pdf-card .resource-icon { width:40px; height:40px; }
-    .pdf-name { margin:14px 0 5px; font-size:14px; font-weight:700; overflow-wrap:anywhere; }
-    .pdf-meta { margin:0; color:var(--muted); font-size:12px; }
-    .pdf-actions { display:flex; gap:8px; margin-top:auto; padding-top:14px; flex-wrap:wrap; }
-    .small-button {
-      min-height:36px; padding:0 11px; border:1px solid var(--line); border-radius:6px;
-      background:white; cursor:pointer; font-size:12px; font-weight:700;
-    }
-    .small-button:hover { border-color:var(--green); color:var(--green); }
-    .small-button.primary { color:white; border-color:var(--green); background:var(--green); }
-    .pdf-empty { grid-column:1/-1; }
-    .move-dialog { width:min(460px,calc(100% - 32px)); }
-    .folder-select { width:100%; height:44px; padding:0 10px; border:1px solid #cfd6ce; border-radius:6px; outline-color:var(--green); background:white; }
-    .viewer-dialog { width:min(1100px,calc(100% - 24px)); height:min(90vh,900px); padding:0; overflow:hidden; }
-    .viewer-dialog::backdrop { background:rgba(19,36,30,.62); }
-    .viewer-top { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 16px; border-bottom:1px solid var(--line); background:var(--white); }
-    .viewer-title { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:14px; font-weight:750; }
-    .viewer-close { min-height:34px; padding:0 10px; border:1px solid var(--line); border-radius:6px; background:white; cursor:pointer; }
-    #pdf-viewer { display:block; width:100%; height:calc(100% - 59px); border:0; background:#525659; }
-    @media (max-width:700px) {
-      .pdf-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
-    }
-    @media (max-width:440px) {
-      .pdf-grid { grid-template-columns:1fr; }
-    }
-
-    @keyframes appear { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-
-    .folder-card { cursor: pointer; }
-    .folder-card:hover { border-color: #cfd8d0; box-shadow: 0 8px 24px rgba(24, 43, 37, .06); }
-    .folder-card .folder-content { margin-top: 14px; }
-    .folder-pdfs { display: grid; gap: 7px; margin-top: 10px; }
-    .folder-pdf-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 7px; background: #fbfbf7; }
-    .folder-pdf-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; font-weight: 650; }
-    .folder-pdf-actions { display: flex; gap: 5px; flex: 0 0 auto; }
-    .folder-pdf-actions .small-button { min-height: 30px; padding: 0 8px; font-size: 11px; }
-    .folder-empty { margin: 8px 0 0; color: var(--muted); font-size: 12px; }
-    .root-pdf-section { margin-top: 28px; }
-    .root-pdf-section h3 { margin: 0 0 12px; font-size: 14px; font-weight: 750; }
-
-    @media (max-width: 700px) {
-      .topbar { padding: 18px 20px; }
-      main { padding: 50px 20px 60px; }
-      h1 { font-size: 39px; }
-      .folder-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .folder-card { min-height: 138px; padding: 15px; }
-      .delete-folder { opacity: 1; }
-    }
-
-    @media (max-width: 440px) {
-      .topbar { gap: 12px; }
-      .brand { font-size: 13px; }
-      .menu-trigger { padding: 0 10px; font-size: 13px; }
-      .section-head { align-items: flex-start; }
-      .folder-grid { grid-template-columns: 1fr; }
-      .folder-card { min-height: 126px; }
-      .resource { align-items: flex-start; flex-wrap: wrap; }
-      .resource a { margin-left: 52px; }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    #status {
+      margin: 20px 0;
+      color: #666;
     }
   </style>
 </head>
+
 <body>
-  <header class="topbar">
-    <div class="brand">
-      <span class="brand-mark" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7.5A1.5 1.5 0 0 1 5.5 6h4l2 2H18.5A1.5 1.5 0 0 1 20 9.5v8a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5z"/><path d="M4 10h16"/></svg>
-      </span>
-      <span>Mon espace de travail</span>
-    </div>
-    <div class="menu-wrap">
-      <button class="menu-trigger" id="menu-trigger" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="section-menu">
-        <span id="menu-label">Cours</span>
-        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m7 10 5 5 5-5"/></svg>
-      </button>
-      <div class="menu-popover" id="section-menu" role="menu" hidden>
-        <button class="menu-option" type="button" role="menuitem" data-section="courses" aria-current="page">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7.5A1.5 1.5 0 0 1 5.5 6h4l2 2H18.5A1.5 1.5 0 0 1 20 9.5v8a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5z"/></svg>
-          Cours
+
+  <h1>Mes fichiers</h1>
+  <p>PDF et fichiers Word présents à la racine du projet GitHub.</p>
+
+  <div class="folders">
+    <strong>Dossiers :</strong>
+    <div id="folders"></div>
+    <br>
+    <button onclick="createFolder()">+ Nouveau dossier</button>
+  </div>
+
+  <div id="status">Chargement...</div>
+  <div id="files"></div>
+
+<script>
+/*
+  Le dépôt GitHub est détecté automatiquement depuis l'URL de la page.
+
+  Exemple :
+  https://moncompte.github.io/monprojet/
+  devient :
+  https://api.github.com/repos/moncompte/monprojet
+*/
+
+const path = window.location.pathname.split("/").filter(Boolean);
+const owner = window.location.hostname.split(".")[0];
+const repo = path[0];
+
+const api = `https://api.github.com/repos/${owner}/${repo}`;
+
+let files = [];
+let folders = [];
+
+async function load() {
+  try {
+    const response = await fetch(api + "/git/trees/main?recursive=1");
+
+    if (!response.ok) {
+      throw new Error("Impossible de lire le dépôt GitHub.");
+    }
+
+    const data = await response.json();
+
+    /*
+      On garde uniquement les PDF et Word qui sont directement
+      à la racine du projet.
+    */
+    files = data.tree.filter(item => {
+      if (item.type !== "blob") return false;
+
+      const name = item.path.toLowerCase();
+
+      return !item.path.includes("/") &&
+        (
+          name.endsWith(".pdf") ||
+          name.endsWith(".doc") ||
+          name.endsWith(".docx")
+        );
+    });
+
+    /*
+      Les dossiers existants dans le dépôt.
+    */
+    folders = [...new Set(
+      data.tree
+        .filter(item => item.type === "tree")
+        .map(item => item.path.split("/")[0])
+    )];
+
+    displayFolders();
+    displayFiles();
+
+    document.getElementById("status").textContent =
+      files.length + " fichier(s) trouvé(s) à la racine.";
+
+  } catch (error) {
+    document.getElementById("status").textContent = error.message;
+  }
+}
+
+function displayFiles() {
+  const container = document.getElementById("files");
+
+  if (files.length === 0) {
+    container.innerHTML = "<p>Aucun PDF ou fichier Word à la racine.</p>";
+    return;
+  }
+
+  container.innerHTML = files.map(file => `
+    <div class="file">
+      <span class="file-name">📄 ${escapeHtml(file.path)}</span>
+
+      <div class="actions">
+        <button onclick="openFile('${encodeURIComponent(file.path)}')">
+          Ouvrir
         </button>
-        <button class="menu-option" type="button" role="menuitem" data-section="revision">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7.5A1.5 1.5 0 0 1 5.5 6h4l2 2H18.5A1.5 1.5 0 0 1 20 9.5v8a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5z"/><path d="m9 13 2 2 4-4"/></svg>
-          Révisions
+
+        <button onclick="moveFile('${encodeURIComponent(file.path)}')">
+          Ranger
         </button>
       </div>
     </div>
-  </header>
+  `).join("");
+}
+
+function displayFolders() {
+  const container = document.getElementById("folders");
+
+  if (folders.length === 0) {
+    container.innerHTML = "<span>Aucun dossier.</span>";
+    return;
+  }
+
+  container.innerHTML = folders.map(folder => `
+    <span class="folder">📁 ${escapeHtml(folder)}</span>
+  `).join("");
+}
+
+function openFile(encodedName) {
+  const name = decodeURIComponent(encodedName);
+
+  const url =
+    `https://github.com/${owner}/${repo}/blob/main/${encodeURIComponent(name)}`;
+
+  window.open(url, "_blank");
+}
+
+async function createFolder() {
+  const name = prompt("Nom du nouveau dossier :");
+
+  if (!name) return;
+
+  alert(
+    "Pour créer réellement un dossier dans GitHub, GitHub demande une écriture dans le dépôt. " +
+    "Un dossier vide ne peut pas être créé seul : il sera créé au moment où tu déplaceras un fichier dedans."
+  );
+}
+
+async function moveFile(encodedName) {
+  const name = decodeURIComponent(encodedName);
+
+  if (folders.length === 0) {
+    alert("Crée d'abord un dossier dans ton dépôt GitHub.");
+    return;
+  }
+
+  const folder = prompt(
+    "Dans quel dossier veux-tu ranger " + name + " ?\n\n" +
+    folders.join("\n")
+  );
+
+  if (!folder || !folders.includes(folder)) {
+    alert("Dossier invalide.");
+    return;
+  }
+
+  alert(
+    "Le déplacement réel d'un fichier dans GitHub nécessite une authentification " +
+    "avec un token GitHub ayant les droits d'écriture."
+  );
+}
+
+function escapeHtml(text) {
+  return text.replace(/[&<>"']/g, char => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#039;"
+  }[char]));
+}
+
+load();
+</script>
 
-  <main>
-    <p class="eyebrow" id="eyebrow">Mon organisation</p>
-    <h1 id="page-title">Mes cours, bien rangés.</h1>
-    <p class="intro" id="page-intro">Retrouve tes supports et organise tes matières dans des dossiers clairs.</p>
-
-    <section aria-labelledby="folder-heading">
-      <div class="section-head">
-        <h2 id="folder-heading">Dossiers <span class="folder-count" id="folder-count"></span></h2>
-        <button class="add-button" id="add-folder" type="button">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
-          Nouveau dossier
-        </button>
-      </div>
-      <div class="folder-grid" id="folder-grid"></div>
-    </section>
-
-    <div class="project-bar">
-      <button class="small-button" id="refresh-pdfs" type="button">Actualiser les PDF</button>
-      <div class="project-status" id="project-status">Détection du dépôt GitHub…</div>
-    </div>
-
-    <section class="pdf-section" aria-labelledby="pdf-heading">
-      <div class="pdf-head">
-        <h2 id="pdf-heading">PDF disponibles <span class="folder-count" id="pdf-count"></span></h2>
-      </div>
-      <div class="pdf-grid" id="pdf-grid">
-        <div class="empty-state pdf-empty">Sélectionne la racine de ton projet pour afficher les PDF.</div>
-      </div>
-    </section>
-  </main>
-
-  <dialog id="folder-dialog" aria-labelledby="dialog-title">
-    <form id="folder-form" method="dialog">
-      <h2 id="dialog-title">Nouveau dossier</h2>
-      <p id="dialog-description">Ajoute un dossier à tes cours.</p>
-      <label class="field-label" for="folder-name">Nom du dossier</label>
-      <input class="folder-input" id="folder-name" name="folder-name" maxlength="48" required autocomplete="off" placeholder="Ex. Histoire">
-      <div class="dialog-actions">
-        <button type="button" id="cancel-dialog">Annuler</button>
-        <button class="confirm" type="submit">Créer le dossier</button>
-      </div>
-    </form>
-  </dialog>
-
-  <dialog class="move-dialog" id="move-dialog" aria-labelledby="move-title">
-    <form id="move-form" method="dialog">
-      <h2 id="move-title">Déplacer le PDF</h2>
-      <p id="move-description"></p>
-      <label class="field-label" for="move-folder">Dossier destination</label>
-      <select class="folder-select" id="move-folder" required></select>
-      <div class="dialog-actions">
-        <button type="button" id="cancel-move">Annuler</button>
-        <button class="confirm" type="submit">Déplacer</button>
-      </div>
-    </form>
-  </dialog>
-
-  <dialog class="viewer-dialog" id="viewer-dialog" aria-labelledby="viewer-title">
-    <div class="viewer-top">
-      <div class="viewer-title" id="viewer-title">PDF</div>
-      <button class="viewer-close" id="close-viewer" type="button">Fermer</button>
-    </div>
-    <iframe id="pdf-viewer" title="Visualisation du PDF"></iframe>
-  </dialog>
-
-  <script>
-    const defaults = {
-      courses: [{ id: "supports", name: "Supports de cours" }],
-      revision: [
-        { id: "fiches", name: "Fiches de révision" },
-        { id: "exercices", name: "Exercices" }
-      ]
-    };
-
-    const storageKey = "espace-travail-folders-v2";
-    const sections = {
-      courses: {
-        label: "Cours",
-        title: "Mes cours, bien rangés.",
-        intro: "Retrouve tes supports et organise tes matières dans des dossiers clairs."
-      },
-      revision: {
-        label: "Révisions",
-        title: "Prête pour les révisions.",
-        intro: "Rassemble tes fiches et tes exercices pour avancer à ton rythme."
-      }
-    };
-
-    let folders;
-    try {
-      const saved = JSON.parse(localStorage.getItem(storageKey));
-      folders = saved && Array.isArray(saved.courses) && Array.isArray(saved.revision)
-        ? saved : structuredClone(defaults);
-    } catch {
-      folders = structuredClone(defaults);
-    }
-
-    let activeSection = "courses";
-    let projectRoot = null;
-    let currentPdfs = [];
-    let objectUrls = [];
-
-    // Quand l'application est publiée sur GitHub Pages, le dépôt est détecté
-    // automatiquement depuis l'URL : https://OWNER.github.io/REPO/
-    // ou depuis https://github.com/OWNER/REPO si la page est ouverte depuis GitHub.
-    let githubRepo = null;
-    let githubToken = sessionStorage.getItem("github-pages-token") || "";
-
-    const trigger = document.querySelector("#menu-trigger");
-    const menu = document.querySelector("#section-menu");
-    const grid = document.querySelector("#folder-grid");
-    const dialog = document.querySelector("#folder-dialog");
-    const input = document.querySelector("#folder-name");
-    const pdfGrid = document.querySelector("#pdf-grid");
-    const chooseProject = document.querySelector("#choose-project");
-    const refreshPdfs = document.querySelector("#refresh-pdfs");
-    const projectStatus = document.querySelector("#project-status");
-    const moveDialog = document.querySelector("#move-dialog");
-    const moveFolder = document.querySelector("#move-folder");
-    const viewerDialog = document.querySelector("#viewer-dialog");
-    const viewer = document.querySelector("#pdf-viewer");
-
-    function saveFolders() {
-      try { localStorage.setItem(storageKey, JSON.stringify(folders)); } catch {}
-    }
-
-    function render() {
-      const section = sections[activeSection];
-      const currentFolders = folders[activeSection];
-      document.querySelector("#menu-label").textContent = section.label;
-      document.querySelector("#page-title").textContent = section.title;
-      document.querySelector("#page-intro").textContent = section.intro;
-      document.querySelector("#folder-count").textContent =
-        `${currentFolders.length} ${currentFolders.length === 1 ? "dossier" : "dossiers"}`;
-
-      document.querySelectorAll(".menu-option").forEach(option => {
-        if (option.dataset.section === activeSection) option.setAttribute("aria-current", "page");
-        else option.removeAttribute("aria-current");
-      });
-
-      if (!currentFolders.length) {
-        grid.innerHTML = '<div class="empty-state">Aucun dossier ici pour le moment.</div>';
-      } else {
-        grid.innerHTML = currentFolders.map((folder, index) => {
-          const folderPdfs = currentPdfs.filter(pdf => pdf.path.split("/")[0] === folder.name);
-          return `
-          <article class="folder-card" style="animation-delay:${index * 45}ms">
-            <div>
-              <span class="folder-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M4 7.5A1.5 1.5 0 0 1 5.5 6h4l2 2H18.5A1.5 1.5 0 0 1 20 9.5v8a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5z"/>
-                  <path d="M4 10h16"/>
-                </svg>
-              </span>
-              <div><p class="folder-name">${escapeHtml(folder.name)}</p><p class="folder-meta">${folderPdfs.length} ${folderPdfs.length === 1 ? "PDF" : "PDFs"}</p></div>
-              <div class="folder-content">
-                ${folderPdfs.length ? `<div class="folder-pdfs">${folderPdfs.map(pdf => {
-                  const pdfIndex = currentPdfs.indexOf(pdf);
-                  return `<div class="folder-pdf-row">
-                    <span class="folder-pdf-name" title="${escapeHtml(pdf.name)}">${escapeHtml(pdf.name)}</span>
-                    <span class="folder-pdf-actions">
-                      <button class="small-button primary" type="button" data-open-pdf="${pdfIndex}">Voir</button>
-                      <button class="small-button" type="button" data-move-pdf="${pdfIndex}">Déplacer</button>
-                    </span>
-                  </div>`;
-                }).join("")}</div>` : `<p class="folder-empty">Aucun PDF dans ce dossier.</p>`}
-              </div>
-            </div>
-            <button class="delete-folder" type="button" data-delete="${folder.id}" aria-label="Supprimer le dossier" title="Supprimer le dossier">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M3 6h18M8 6V4h8v2m3 0-1 14H6L5 6m4 4v6m6-6v6"/>
-              </svg>
-            </button>
-          </article>`;
-        }).join("");
-      }
-      renderPdfs();
-    }
-
-    function detectGithubRepo() {
-      const host = window.location.hostname;
-      const path = window.location.pathname.split("/").filter(Boolean);
-
-      if (host.endsWith(".github.io")) {
-        const owner = host.slice(0, -".github.io".length);
-        const repo = path[0] || `${owner}.github.io`;
-        if (owner && repo) return { owner, repo };
-      }
-
-      if (host === "github.com" && path.length >= 2) {
-        return { owner: path[0], repo: path[1].replace(/\.git$/, "") };
-      }
-
-      // Permet aussi de configurer manuellement le dépôt pour un domaine personnalisé.
-      const configured = document.body.dataset.githubRepo;
-      if (configured && configured.includes("/")) {
-        const [owner, repo] = configured.split("/");
-        if (owner && repo) return { owner, repo };
-      }
-
-      return null;
-    }
-
-    function githubApiUrl(path = "") {
-      return `https://api.github.com/repos/${githubRepo.owner}/${githubRepo.repo}/contents/${path}`;
-    }
-
-    function githubHeaders(json = false) {
-      const headers = { Accept: "application/vnd.github+json" };
-      if (json) headers["Content-Type"] = "application/json";
-      if (githubToken) headers.Authorization = `Bearer ${githubToken}`;
-      return headers;
-    }
-
-    async function githubRequest(url, options = {}) {
-      const response = await fetch(url, { ...options, headers: { ...githubHeaders(Boolean(options.body)), ...(options.headers || {}) } });
-      if (!response.ok) {
-        let message = `${response.status} ${response.statusText}`;
-        try {
-          const data = await response.json();
-          if (data.message) message = data.message;
-        } catch {}
-        throw new Error(message);
-      }
-      return response.status === 204 ? null : response.json();
-    }
-
-    async function scanGithubRootPdfs() {
-      const pdfs = [];
-      async function walk(path = "") {
-        const data = await githubRequest(githubApiUrl(path));
-        if (!Array.isArray(data)) return;
-        for (const item of data) {
-          if (item.type === "file" && item.name.toLowerCase().endsWith(".pdf")) {
-            pdfs.push(item);
-          } else if (item.type === "dir") {
-            await walk(item.path);
-          }
-        }
-      }
-      await walk("");
-      return pdfs.sort((a, b) => a.path.localeCompare(b.path, "fr"));
-    }
-
-    async function refreshPdfList() {
-      if (!githubRepo && !projectRoot) return;
-      try {
-        if (githubRepo) {
-          currentPdfs = await scanGithubRootPdfs();
-          projectStatus.innerHTML = `<strong>${escapeHtml(githubRepo.owner + "/" + githubRepo.repo)}</strong> · racine GitHub · ${currentPdfs.length} PDF`;
-        } else {
-          currentPdfs = await scanRootPdfs();
-          projectStatus.innerHTML = `<strong>${escapeHtml(projectRoot.name)}</strong> · ${currentPdfs.length} PDF à la racine`;
-        }
-        renderPdfs();
-      } catch (error) {
-        console.error(error);
-        projectStatus.innerHTML = `Impossible de lire le dépôt GitHub. <strong>${escapeHtml(error.message)}</strong>`;
-        renderPdfs();
-      }
-    }
-
-    function escapeHtml(value) {
-      return String(value).replace(/[&<>"']/g, char => ({
-        "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#039;"
-      }[char]));
-    }
-
-    function renderPdfs() {
-      document.querySelector("#pdf-count").textContent =
-        `${currentPdfs.length} ${currentPdfs.length === 1 ? "PDF" : "PDFs"}`;
-
-      if (!githubRepo && !projectRoot) {
-        pdfGrid.innerHTML = '<div class="empty-state pdf-empty">Dépôt GitHub non détecté.</div>';
-        return;
-      }
-
-      const rootPdfs = currentPdfs.filter(pdf => !pdf.path.includes("/"));
-      const folderNames = new Set(folders[activeSection].map(folder => folder.name));
-      const discoveredFolders = [...new Set(currentPdfs.filter(pdf => pdf.path.includes("/")).map(pdf => pdf.path.split("/")[0]))];
-      const allFolderNames = [...new Set([...folders[activeSection].map(f => f.name), ...discoveredFolders])];
-
-      const rootHtml = `
-        <section class="root-pdf-section">
-          <h3>PDF à la racine <span class="folder-count">${rootPdfs.length}</span></h3>
-          ${rootPdfs.length ? `<div class="pdf-grid">${rootPdfs.map(pdf => {
-            const index = currentPdfs.indexOf(pdf);
-            return `<article class="pdf-card">
-              <span class="resource-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></svg></span>
-              <p class="pdf-name">${escapeHtml(pdf.name)}</p>
-              <p class="pdf-meta">PDF · à classer</p>
-              <div class="pdf-actions"><button class="small-button primary" type="button" data-open-pdf="${index}">Visualiser</button><button class="small-button" type="button" data-move-pdf="${index}">Ranger</button></div>
-            </article>`;
-          }).join("")}</div>` : '<div class="empty-state">Tous les PDF sont rangés dans des dossiers.</div>'}
-        </section>`;
-
-      const folderHtml = allFolderNames.map(name => {
-        const pdfs = currentPdfs.filter(pdf => pdf.path.split("/")[0] === name);
-        const isKnown = folderNames.has(name);
-        return `<section class="root-pdf-section">
-          <div class="pdf-head"><h3>📁 ${escapeHtml(name)} <span class="folder-count">${pdfs.length} ${pdfs.length === 1 ? "PDF" : "PDFs"}</span></h3></div>
-          ${pdfs.length ? `<div class="pdf-grid">${pdfs.map(pdf => {
-            const index = currentPdfs.indexOf(pdf);
-            return `<article class="pdf-card">
-              <span class="resource-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></svg></span>
-              <p class="pdf-name">${escapeHtml(pdf.name)}</p>
-              <p class="pdf-meta">PDF · ${escapeHtml(name)}</p>
-              <div class="pdf-actions"><button class="small-button primary" type="button" data-open-pdf="${index}">Visualiser</button><button class="small-button" type="button" data-move-pdf="${index}">Déplacer</button></div>
-            </article>`;
-          }).join("")}</div>` : '<div class="empty-state">Dossier vide.</div>'}
-        </section>`;
-      }).join("");
-
-      pdfGrid.innerHTML = (rootHtml + folderHtml) || '<div class="empty-state pdf-empty">Aucun PDF trouvé dans le dépôt.</div>';
-    }
-
-    async function scanRootPdfs() {
-      if (!projectRoot) return [];
-      const pdfs = [];
-      async function walk(directory, prefix = "") {
-        for await (const [name, handle] of directory.entries()) {
-          const path = prefix ? `${prefix}/${name}` : name;
-          if (handle.kind === "file" && name.toLowerCase().endsWith(".pdf")) pdfs.push({ name, path, handle });
-          else if (handle.kind === "directory") await walk(handle, path);
-        }
-      }
-      await walk(projectRoot);
-      pdfs.sort((a, b) => a.path.localeCompare(b.path, "fr"));
-      return pdfs;
-    }
-
-    async function openPdf(index) {
-      const pdf = currentPdfs[index];
-      if (!pdf) return;
-      try {
-        let url;
-        if (githubRepo) {
-          url = pdf.download_url || `https://raw.githubusercontent.com/${githubRepo.owner}/${githubRepo.repo}/HEAD/${pdf.path}`;
-        } else {
-          const file = await pdf.handle.getFile();
-          objectUrls.forEach(item => URL.revokeObjectURL(item));
-          objectUrls = [];
-          url = URL.createObjectURL(file);
-          objectUrls.push(url);
-        }
-        viewer.src = url;
-        document.querySelector("#viewer-title").textContent = pdf.name;
-        viewerDialog.showModal();
-      } catch (error) {
-        console.error(error);
-        alert("Impossible d'ouvrir ce PDF.");
-      }
-    }
-
-    function openMoveDialog(index) {
-      const pdf = currentPdfs[index];
-      if (!pdf) return;
-      moveFolder.innerHTML = folders[activeSection].map(folder =>
-        `<option value="${escapeHtml(folder.name)}">${escapeHtml(folder.name)}</option>`
-      ).join("");
-
-      if (!folders[activeSection].length) {
-        alert("Crée d'abord au moins un dossier.");
-        return;
-      }
-
-      moveDialog.dataset.pdfIndex = String(index);
-      document.querySelector("#move-description").textContent =
-        `Choisis le dossier dans lequel déplacer « ${pdf.name} ».`;
-      moveDialog.showModal();
-    }
-
-    function getGithubToken() {
-      if (githubToken) return githubToken;
-      const token = prompt(
-        "Pour déplacer ou créer des fichiers dans GitHub, colle un token GitHub avec accès Contents: Read and write.\n\nLe token est conservé uniquement dans cette session du navigateur."
-      );
-      if (!token) return null;
-      githubToken = token.trim();
-      sessionStorage.setItem("github-pages-token", githubToken);
-      return githubToken;
-    }
-
-    function arrayBufferToBase64(buffer) {
-      let binary = "";
-      const bytes = new Uint8Array(buffer);
-      const chunk = 0x8000;
-      for (let i = 0; i < bytes.length; i += chunk) {
-        binary += String.fromCharCode(...bytes.subarray(i, i + chunk));
-      }
-      return btoa(binary);
-    }
-
-    async function githubGetFile(path) {
-      return await githubRequest(githubApiUrl(path));
-    }
-
-    async function githubCreateFolder(folderName) {
-      if (!getGithubToken()) throw new Error("Token GitHub requis.");
-      try {
-        await githubGetFile(`${encodeURIComponent(folderName)}/.gitkeep`);
-      } catch (error) {
-        if (!String(error.message).startsWith("404")) throw error;
-        await githubRequest(githubApiUrl(`${encodeURIComponent(folderName)}/.gitkeep`), {
-          method: "PUT",
-          body: JSON.stringify({
-            message: `Créer le dossier ${folderName}`,
-            content: btoa(""),
-            branch: undefined
-          })
-        });
-      }
-    }
-
-    async function moveGithubPdf(pdf, destinationName) {
-      if (!getGithubToken()) return;
-      const source = await githubGetFile(encodeURIComponent(pdf.path));
-      const response = await fetch(pdf.download_url);
-      if (!response.ok) throw new Error("Impossible de télécharger le PDF source.");
-      const buffer = await response.arrayBuffer();
-      const content = arrayBufferToBase64(buffer);
-      const targetPath = `${destinationName}/${pdf.name}`;
-
-      let existing = null;
-      try { existing = await githubGetFile(targetPath.split("/").map(encodeURIComponent).join("/")); } catch (error) {
-        if (!String(error.message).startsWith("404")) throw error;
-      }
-      if (existing && !confirm(`« ${pdf.name} » existe déjà dans « ${destinationName} ». Le remplacer ?`)) return;
-
-      await githubRequest(githubApiUrl(targetPath.split("/").map(encodeURIComponent).join("/")), {
-        method: "PUT",
-        body: JSON.stringify({
-          message: `Déplacer ${pdf.name} vers ${destinationName}`,
-          content,
-          ...(existing ? { sha: existing.sha } : {})
-        })
-      });
-
-      await githubRequest(githubApiUrl(encodeURIComponent(pdf.path)), {
-        method: "DELETE",
-        body: JSON.stringify({
-          message: `Supprimer ${pdf.name} après déplacement`,
-          sha: source.sha
-        })
-      });
-    }
-
-    async function movePdf(index, destinationName) {
-      const pdf = currentPdfs[index];
-      if (!pdf) return;
-      try {
-        if (githubRepo) {
-          await moveGithubPdf(pdf, destinationName);
-        } else if (projectRoot) {
-          const destination = await projectRoot.getDirectoryHandle(destinationName, { create: true });
-          const sourceFile = await pdf.handle.getFile();
-          const target = await destination.getFileHandle(pdf.name, { create: true });
-          try {
-            await target.getFile();
-            if (!confirm(`« ${pdf.name} » existe déjà dans « ${destinationName} ». Le remplacer ?`)) return;
-          } catch {}
-          const writable = await target.createWritable();
-          await writable.write(await sourceFile.arrayBuffer());
-          await writable.close();
-          const parts = pdf.path.split("/");
-          const fileName = parts.pop();
-          let parent = projectRoot;
-          for (const part of parts) parent = await parent.getDirectoryHandle(part);
-          await parent.removeEntry(fileName);
-        }
-        await refreshPdfList();
-      } catch (error) {
-        console.error(error);
-        alert(`Le déplacement a échoué : ${error.message}`);
-      }
-    }
-
-    trigger.addEventListener("click", () => {
-      const isOpen = trigger.getAttribute("aria-expanded") === "true";
-      trigger.setAttribute("aria-expanded", String(!isOpen));
-      menu.hidden = isOpen;
-    });
-
-    document.querySelectorAll(".menu-option").forEach(option => {
-      option.addEventListener("click", () => {
-        activeSection = option.dataset.section;
-        menu.hidden = true;
-        trigger.setAttribute("aria-expanded", "false");
-        render();
-        trigger.focus();
-      });
-    });
-
-    document.addEventListener("click", event => {
-      if (!event.target.closest(".menu-wrap")) {
-        menu.hidden = true;
-        trigger.setAttribute("aria-expanded", "false");
-      }
-    });
-
-    document.addEventListener("keydown", event => {
-      if (event.key === "Escape" && !menu.hidden) {
-        menu.hidden = true;
-        trigger.setAttribute("aria-expanded", "false");
-        trigger.focus();
-      }
-    });
-
-    document.querySelector("#add-folder").addEventListener("click", async () => {
-      document.querySelector("#dialog-description").textContent =
-        `Ajoute un dossier à ${sections[activeSection].label.toLowerCase()}.`;
-      input.value = "";
-      dialog.showModal();
-      input.focus();
-    });
-
-    document.querySelector("#cancel-dialog").addEventListener("click", () => dialog.close());
-
-    document.querySelector("#folder-form").addEventListener("submit", async event => {
-      event.preventDefault();
-      const name = input.value.trim();
-      if (!name) return;
-
-      // Le dossier est enregistré dans l'interface et, si la racine est ouverte,
-      // il est aussi créé physiquement dans le projet.
-      try {
-        if (githubRepo) {
-          await githubCreateFolder(name);
-        } else if (projectRoot) {
-          await projectRoot.getDirectoryHandle(name, { create: true });
-        }
-      } catch (error) {
-        console.error(error);
-        alert(`Impossible de créer le dossier : ${error.message}`);
-        return;
-      }
-
-      folders[activeSection].push({ id: crypto.randomUUID(), name });
-      saveFolders();
-      dialog.close();
-      render();
-      await refreshPdfList();
-      document.querySelector("#add-folder").focus();
-    });
-
-    grid.addEventListener("click", async event => {
-      const button = event.target.closest("[data-delete]");
-      if (!button) return;
-
-      const folder = folders[activeSection].find(f => f.id === button.dataset.delete);
-      if (!folder) return;
-
-      if (githubRepo) {
-        if (!confirm(`Supprimer « ${folder.name} » de l'interface ? Les fichiers présents dans GitHub ne seront pas supprimés automatiquement.`)) return;
-      } else if (projectRoot) {
-        const confirmed = confirm(`Supprimer « ${folder.name} » de l'interface et tenter de supprimer le dossier vide du projet ?`);
-        if (!confirmed) return;
-        try {
-          await projectRoot.removeEntry(folder.name, { recursive: false });
-        } catch (error) {
-          if (error.name !== "NotFoundError") alert("Le dossier contient probablement des fichiers et n'a pas été supprimé du disque.");
-        }
-      }
-
-      folders[activeSection] = folders[activeSection].filter(folder => folder.id !== button.dataset.delete);
-      saveFolders();
-      render();
-    });
-
-    pdfGrid.addEventListener("click", event => {
-      const openButton = event.target.closest("[data-open-pdf]");
-      if (openButton) {
-        openPdf(Number(openButton.dataset.openPdf));
-        return;
-      }
-
-      const moveButton = event.target.closest("[data-move-pdf]");
-      if (moveButton) openMoveDialog(Number(moveButton.dataset.movePdf));
-    });
-
-    document.querySelector("#folder-form").addEventListener("keydown", event => {
-      if (event.key === "Escape") dialog.close();
-    });
-
-    document.querySelector("#cancel-move").addEventListener("click", () => moveDialog.close());
-
-    document.querySelector("#move-form").addEventListener("submit", async event => {
-      event.preventDefault();
-      const index = Number(moveDialog.dataset.pdfIndex);
-      const destination = moveFolder.value;
-      moveDialog.close();
-      await movePdf(index, destination);
-    });
-
-    document.querySelector("#close-viewer").addEventListener("click", () => {
-      viewerDialog.close();
-      viewer.src = "";
-    });
-
-    viewerDialog.addEventListener("close", () => {
-      viewer.src = "";
-    });
-
-    refreshPdfs.addEventListener("click", refreshPdfList);
-
-    // Détection automatique du dépôt GitHub. Aucun sélecteur de dossier n'est nécessaire
-    // lorsque l'application est servie par GitHub Pages.
-    githubRepo = detectGithubRepo();
-    if (githubRepo) {
-      projectStatus.innerHTML = `<strong>${escapeHtml(githubRepo.owner + "/" + githubRepo.repo)}</strong> · connexion automatique à la racine GitHub…`;
-      refreshPdfList();
-    } else if (window.showDirectoryPicker) {
-      projectStatus.innerHTML = "Dépôt GitHub non détecté automatiquement. Si tu ouvres le HTML localement, il faut sélectionner le dossier du projet.";
-    } else {
-      projectStatus.innerHTML = "Dépôt GitHub non détecté automatiquement.";
-    }
-
-    render();
-  </script>
 </body>
 </html>
