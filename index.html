@@ -1,0 +1,544 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f4ee">
+  <title>Mon espace de travail</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #182b25;
+      --muted: #68756f;
+      --paper: #f5f4ee;
+      --white: #fffefa;
+      --green: #174d3c;
+      --mint: #dcebe0;
+      --coral: #d76d52;
+      --yellow: #f0c970;
+      --line: #e5e5dc;
+      font-family: "Avenir Next", Avenir, "Segoe UI", sans-serif;
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+    }
+
+    * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+
+    body {
+      min-width: 320px;
+      min-height: 100vh;
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(ellipse at 88% 8%, rgba(240, 201, 112, .20), transparent 24rem),
+        radial-gradient(ellipse at 0% 65%, rgba(220, 235, 224, .58), transparent 26rem),
+        var(--paper);
+    }
+
+    button, input { font: inherit; }
+    button { color: inherit; }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 26px 32px;
+      border-bottom: 1px solid rgba(24, 43, 37, .1);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      color: var(--green);
+      font-size: 15px;
+      font-weight: 750;
+    }
+
+    .brand-mark {
+      display: grid;
+      width: 34px;
+      height: 34px;
+      place-items: center;
+      border-radius: 11px;
+      color: var(--white);
+      background: var(--green);
+    }
+
+    .brand-mark svg { width: 19px; height: 19px; }
+
+    .menu-wrap { position: relative; }
+
+    .menu-trigger {
+      display: inline-flex;
+      min-height: 42px;
+      align-items: center;
+      gap: 10px;
+      padding: 0 14px;
+      border: 1px solid #d9ddd5;
+      border-radius: 8px;
+      background: var(--white);
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 650;
+    }
+
+    .menu-trigger:hover, .menu-trigger[aria-expanded="true"] { border-color: var(--green); }
+    .menu-trigger svg { width: 16px; height: 16px; }
+    .menu-trigger .chevron { transition: transform .18s ease; }
+    .menu-trigger[aria-expanded="true"] .chevron { transform: rotate(180deg); }
+
+    .menu-popover {
+      position: absolute;
+      z-index: 2;
+      top: calc(100% + 8px);
+      right: 0;
+      width: 210px;
+      padding: 6px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--white);
+      box-shadow: 0 14px 34px rgba(24, 43, 37, .13);
+    }
+
+    .menu-popover[hidden] { display: none; }
+
+    .menu-option {
+      display: flex;
+      width: 100%;
+      min-height: 42px;
+      align-items: center;
+      gap: 10px;
+      padding: 0 10px;
+      border: 0;
+      border-radius: 6px;
+      background: transparent;
+      cursor: pointer;
+      text-align: left;
+      font-size: 14px;
+    }
+
+    .menu-option:hover, .menu-option[aria-current="page"] { color: var(--green); background: #edf3ed; }
+    .menu-option svg { width: 17px; height: 17px; }
+
+    main {
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 66px 32px 80px;
+      animation: appear .45s ease both;
+    }
+
+    .eyebrow {
+      margin: 0 0 14px;
+      color: var(--coral);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      max-width: 660px;
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 48px;
+      font-weight: 500;
+      line-height: 1.08;
+    }
+
+    .intro {
+      max-width: 520px;
+      margin: 16px 0 0;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      margin: 48px 0 18px;
+    }
+
+    h2 { margin: 0; font-size: 17px; font-weight: 750; }
+
+    .folder-count { margin-left: 8px; color: var(--muted); font-size: 13px; font-weight: 500; }
+
+    .add-button {
+      display: inline-flex;
+      min-height: 42px;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 0 14px;
+      border: 0;
+      border-radius: 7px;
+      color: white;
+      background: var(--green);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 700;
+      transition: background .18s ease, transform .18s ease;
+    }
+
+    .add-button:hover { transform: translateY(-1px); background: #103d30; }
+    .add-button svg { width: 16px; height: 16px; }
+
+    .folder-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .folder-card {
+      position: relative;
+      display: flex;
+      min-height: 150px;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 19px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--white);
+      animation: appear .3s ease both;
+    }
+
+    .folder-icon {
+      display: grid;
+      width: 42px;
+      height: 42px;
+      place-items: center;
+      border-radius: 12px;
+      color: var(--green);
+      background: var(--mint);
+    }
+
+    .folder-icon svg { width: 22px; height: 22px; }
+    .folder-card:nth-child(3n + 2) .folder-icon { color: #a34e38; background: #f8e6df; }
+    .folder-card:nth-child(3n) .folder-icon { color: #755815; background: #fbf0d3; }
+
+    .folder-name {
+      overflow-wrap: anywhere;
+      margin: 16px 0 4px;
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .folder-meta { margin: 0; color: var(--muted); font-size: 12px; }
+
+    .delete-folder {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      display: grid;
+      width: 32px;
+      height: 32px;
+      place-items: center;
+      border: 0;
+      border-radius: 6px;
+      color: #7b8580;
+      background: transparent;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity .15s ease, background .15s ease;
+    }
+
+    .folder-card:hover .delete-folder, .delete-folder:focus-visible { opacity: 1; }
+    .delete-folder:hover { color: #a13f32; background: #f8e6df; }
+    .delete-folder svg { width: 16px; height: 16px; }
+
+    .empty-state {
+      padding: 34px 20px;
+      border: 1px dashed #c8d0c8;
+      border-radius: 9px;
+      color: var(--muted);
+      background: rgba(255, 254, 250, .55);
+      font-size: 14px;
+      text-align: center;
+    }
+
+    .resource {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      max-width: 500px;
+      margin-top: 34px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 254, 250, .76);
+    }
+
+    .resource-icon {
+      display: grid;
+      width: 38px;
+      height: 38px;
+      flex: 0 0 auto;
+      place-items: center;
+      border-radius: 8px;
+      color: #a34e38;
+      background: #f8e6df;
+    }
+
+    .resource-icon svg { width: 19px; height: 19px; }
+    .resource-copy { min-width: 0; flex: 1; }
+    .resource-copy strong { display: block; overflow-wrap: anywhere; font-size: 13px; }
+    .resource-copy span { display: block; margin-top: 4px; color: var(--muted); font-size: 12px; }
+    .resource a { color: var(--green); font-size: 13px; font-weight: 700; text-decoration: none; }
+    .resource a:hover { text-decoration: underline; }
+    .resource-link { color: var(--green); font-size: 13px; font-weight: 700; white-space: nowrap; }
+
+    dialog {
+      width: min(420px, calc(100% - 32px));
+      padding: 26px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      color: var(--ink);
+      background: var(--white);
+      box-shadow: 0 24px 70px rgba(24, 43, 37, .2);
+    }
+
+    dialog::backdrop { background: rgba(19, 36, 30, .42); backdrop-filter: blur(3px); }
+    dialog h2 { font-family: Georgia, "Times New Roman", serif; font-size: 25px; font-weight: 500; }
+    dialog p { margin: 9px 0 20px; color: var(--muted); font-size: 14px; line-height: 1.5; }
+    .field-label { display: block; margin-bottom: 7px; font-size: 13px; font-weight: 700; }
+    .folder-input { width: 100%; height: 44px; padding: 0 11px; border: 1px solid #cfd6ce; border-radius: 6px; outline-color: var(--green); }
+    .dialog-actions { display: flex; justify-content: flex-end; gap: 9px; margin-top: 20px; }
+    .dialog-actions button { min-height: 40px; padding: 0 13px; border: 1px solid var(--line); border-radius: 6px; background: white; cursor: pointer; font-size: 13px; font-weight: 650; }
+    .dialog-actions .confirm { border-color: var(--green); color: white; background: var(--green); }
+
+    @keyframes appear { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    @media (max-width: 700px) {
+      .topbar { padding: 18px 20px; }
+      main { padding: 50px 20px 60px; }
+      h1 { font-size: 39px; }
+      .folder-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .folder-card { min-height: 138px; padding: 15px; }
+      .delete-folder { opacity: 1; }
+    }
+
+    @media (max-width: 440px) {
+      .topbar { gap: 12px; }
+      .brand { font-size: 13px; }
+      .menu-trigger { padding: 0 10px; font-size: 13px; }
+      .section-head { align-items: flex-start; }
+      .folder-grid { grid-template-columns: 1fr; }
+      .folder-card { min-height: 126px; }
+      .resource { align-items: flex-start; flex-wrap: wrap; }
+      .resource a { margin-left: 52px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7.5A1.5 1.5 0 0 1 5.5 6h4l2 2H18.5A1.5 1.5 0 0 1 20 9.5v8a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5z"/><path d="M4 10h16"/></svg>
+      </span>
+      <span>Mon espace de travail</span>
+    </div>
+    <div class="menu-wrap">
+      <button class="menu-trigger" id="menu-trigger" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="section-menu">
+        <span id="menu-label">Cours</span>
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m7 10 5 5 5-5"/></svg>
+      </button>
+      <div class="menu-popover" id="section-menu" role="menu" hidden>
+        <button class="menu-option" type="button" role="menuitem" data-section="courses" aria-current="page">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7.5A1.5 1.5 0 0 1 5.5 6h4l2 2H18.5A1.5 1.5 0 0 1 20 9.5v8a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5z"/></svg>
+          Cours
+        </button>
+        <button class="menu-option" type="button" role="menuitem" data-section="revision">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7.5A1.5 1.5 0 0 1 5.5 6h4l2 2H18.5A1.5 1.5 0 0 1 20 9.5v8a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5z"/><path d="m9 13 2 2 4-4"/></svg>
+          Révisions
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <p class="eyebrow" id="eyebrow">Mon organisation</p>
+    <h1 id="page-title">Mes cours, bien rangés.</h1>
+    <p class="intro" id="page-intro">Retrouve tes supports et organise tes matières dans des dossiers clairs.</p>
+
+    <section aria-labelledby="folder-heading">
+      <div class="section-head">
+        <h2 id="folder-heading">Dossiers <span class="folder-count" id="folder-count"></span></h2>
+        <button class="add-button" id="add-folder" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+          Nouveau dossier
+        </button>
+      </div>
+      <div class="folder-grid" id="folder-grid"></div>
+    </section>
+
+    <a class="resource" href="creation-monitor_papier.pdf" id="course-resource">
+      <span class="resource-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></svg>
+      </span>
+      <span class="resource-copy"><strong>creation-monitor_papier.pdf</strong><span>Document de cours · 8 pages</span></span>
+      <span class="resource-link">Ouvrir ↗</span>
+    </a>
+  </main>
+
+  <dialog id="folder-dialog" aria-labelledby="dialog-title">
+    <form id="folder-form" method="dialog">
+      <h2 id="dialog-title">Nouveau dossier</h2>
+      <p id="dialog-description">Ajoute un dossier à tes cours.</p>
+      <label class="field-label" for="folder-name">Nom du dossier</label>
+      <input class="folder-input" id="folder-name" name="folder-name" maxlength="48" required autocomplete="off" placeholder="Ex. Histoire">
+      <div class="dialog-actions">
+        <button type="button" id="cancel-dialog">Annuler</button>
+        <button class="confirm" type="submit">Créer le dossier</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script>
+    const defaults = {
+      courses: [{ id: "supports", name: "Supports de cours" }],
+      revision: [
+        { id: "fiches", name: "Fiches de révision" },
+        { id: "exercices", name: "Exercices" }
+      ]
+    };
+    const storageKey = "espace-travail-folders-v1";
+    const sections = {
+      courses: {
+        label: "Cours",
+        title: "Mes cours, bien rangés.",
+        intro: "Retrouve tes supports et organise tes matières dans des dossiers clairs."
+      },
+      revision: {
+        label: "Révisions",
+        title: "Prête pour les révisions.",
+        intro: "Rassemble tes fiches et tes exercices pour avancer à ton rythme."
+      }
+    };
+
+    let folders;
+    try {
+      const saved = JSON.parse(localStorage.getItem(storageKey));
+      folders = saved && Array.isArray(saved.courses) && Array.isArray(saved.revision) ? saved : structuredClone(defaults);
+    } catch {
+      folders = structuredClone(defaults);
+    }
+
+    let activeSection = "courses";
+    const trigger = document.querySelector("#menu-trigger");
+    const menu = document.querySelector("#section-menu");
+    const grid = document.querySelector("#folder-grid");
+    const dialog = document.querySelector("#folder-dialog");
+    const input = document.querySelector("#folder-name");
+
+    function saveFolders() {
+      try { localStorage.setItem(storageKey, JSON.stringify(folders)); } catch { /* Storage can be unavailable in private browsing. */ }
+    }
+
+    function render() {
+      const section = sections[activeSection];
+      const currentFolders = folders[activeSection];
+      document.querySelector("#menu-label").textContent = section.label;
+      document.querySelector("#page-title").textContent = section.title;
+      document.querySelector("#page-intro").textContent = section.intro;
+      document.querySelector("#folder-count").textContent = `${currentFolders.length} ${currentFolders.length === 1 ? "dossier" : "dossiers"}`;
+      document.querySelector("#course-resource").hidden = activeSection !== "courses";
+      document.querySelectorAll(".menu-option").forEach(option => {
+        if (option.dataset.section === activeSection) option.setAttribute("aria-current", "page");
+        else option.removeAttribute("aria-current");
+      });
+
+      if (currentFolders.length === 0) {
+        grid.innerHTML = '<div class="empty-state">Aucun dossier ici pour le moment.</div>';
+        return;
+      }
+
+      grid.innerHTML = currentFolders.map((folder, index) => `
+        <article class="folder-card" style="animation-delay:${index * 45}ms">
+          <span class="folder-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7.5A1.5 1.5 0 0 1 5.5 6h4l2 2H18.5A1.5 1.5 0 0 1 20 9.5v8a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5z"/><path d="M4 10h16"/></svg>
+          </span>
+          <div><p class="folder-name"></p><p class="folder-meta">Dossier</p></div>
+          <button class="delete-folder" type="button" data-delete="${folder.id}" aria-label="Supprimer le dossier" title="Supprimer le dossier">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2m3 0-1 14H6L5 6m4 4v6m6-6v6"/></svg>
+          </button>
+        </article>`).join("");
+
+      grid.querySelectorAll(".folder-card").forEach((card, index) => {
+        card.querySelector(".folder-name").textContent = currentFolders[index].name;
+      });
+    }
+
+    trigger.addEventListener("click", () => {
+      const isOpen = trigger.getAttribute("aria-expanded") === "true";
+      trigger.setAttribute("aria-expanded", String(!isOpen));
+      menu.hidden = isOpen;
+    });
+
+    document.querySelectorAll(".menu-option").forEach(option => {
+      option.addEventListener("click", () => {
+        activeSection = option.dataset.section;
+        menu.hidden = true;
+        trigger.setAttribute("aria-expanded", "false");
+        render();
+        trigger.focus();
+      });
+    });
+
+    document.addEventListener("click", event => {
+      if (!event.target.closest(".menu-wrap")) {
+        menu.hidden = true;
+        trigger.setAttribute("aria-expanded", "false");
+      }
+    });
+
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape" && !menu.hidden) {
+        menu.hidden = true;
+        trigger.setAttribute("aria-expanded", "false");
+        trigger.focus();
+      }
+    });
+
+    document.querySelector("#add-folder").addEventListener("click", () => {
+      document.querySelector("#dialog-description").textContent = `Ajoute un dossier à ${sections[activeSection].label.toLowerCase()}.`;
+      input.value = "";
+      dialog.showModal();
+      input.focus();
+    });
+
+    document.querySelector("#cancel-dialog").addEventListener("click", () => dialog.close());
+
+    document.querySelector("#folder-form").addEventListener("submit", event => {
+      event.preventDefault();
+      const name = input.value.trim();
+      if (!name) return;
+      folders[activeSection].push({ id: crypto.randomUUID(), name });
+      saveFolders();
+      dialog.close();
+      render();
+      document.querySelector("#add-folder").focus();
+    });
+
+    grid.addEventListener("click", event => {
+      const button = event.target.closest("[data-delete]");
+      if (!button) return;
+      folders[activeSection] = folders[activeSection].filter(folder => folder.id !== button.dataset.delete);
+      saveFolders();
+      render();
+    });
+
+    render();
+  </script>
+</body>
+</html>
