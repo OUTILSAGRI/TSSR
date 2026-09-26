@@ -72,13 +72,11 @@
 <body>
 
   <h1>Mes fichiers</h1>
-  <p>PDF et fichiers Word présents à la racine du projet GitHub.</p>
+  <p>PDF et fichiers Word présents dans le projet GitHub, classés par dossier.</p>
 
   <div class="folders">
     <strong>Dossiers :</strong>
     <div id="folders"></div>
-    <br>
-    <button onclick="createFolder()">+ Nouveau dossier</button>
   </div>
 
   <div id="status">Chargement...</div>
@@ -113,26 +111,20 @@ async function load() {
 
     const data = await response.json();
 
-    /*
-      On garde uniquement les PDF et Word qui sont directement
-      à la racine du projet.
-    */
+    // Tous les PDF et fichiers Word du dépôt, même s'ils sont dans des dossiers.
     files = data.tree.filter(item => {
       if (item.type !== "blob") return false;
 
       const name = item.path.toLowerCase();
 
-      return !item.path.includes("/") &&
-        (
-          name.endsWith(".pdf") ||
-          name.endsWith(".doc") ||
-          name.endsWith(".docx")
-        );
+      return (
+        name.endsWith(".pdf") ||
+        name.endsWith(".doc") ||
+        name.endsWith(".docx")
+      );
     });
 
-    /*
-      Les dossiers existants dans le dépôt.
-    */
+    // Récupère tous les dossiers de la racine.
     folders = [...new Set(
       data.tree
         .filter(item => item.type === "tree")
@@ -143,7 +135,7 @@ async function load() {
     displayFiles();
 
     document.getElementById("status").textContent =
-      files.length + " fichier(s) trouvé(s) à la racine.";
+      files.length + " fichier(s) trouvé(s) dans le projet.";
 
   } catch (error) {
     document.getElementById("status").textContent = error.message;
@@ -154,23 +146,39 @@ function displayFiles() {
   const container = document.getElementById("files");
 
   if (files.length === 0) {
-    container.innerHTML = "<p>Aucun PDF ou fichier Word à la racine.</p>";
+    container.innerHTML = "<p>Aucun PDF ou fichier Word trouvé.</p>";
     return;
   }
 
-  container.innerHTML = files.map(file => `
-    <div class="file">
-      <span class="file-name">📄 ${escapeHtml(file.path)}</span>
+  // Classe les fichiers par dossier racine.
+  const groups = {};
 
-      <div class="actions">
-        <button onclick="openFile('${encodeURIComponent(file.path)}')">
-          Ouvrir
-        </button>
+  files.forEach(file => {
+    const parts = file.path.split("/");
+    const folder = parts.length > 1 ? parts[0] : "Racine";
 
-        <button onclick="moveFile('${encodeURIComponent(file.path)}')">
-          Ranger
-        </button>
-      </div>
+    if (!groups[folder]) groups[folder] = [];
+    groups[folder].push(file);
+  });
+
+  container.innerHTML = Object.keys(groups).sort().map(folder => `
+    <div class="folders">
+      <h2>📁 ${escapeHtml(folder)}</h2>
+      ${groups[folder].map(file => `
+        <div class="file">
+          <span class="file-name">📄 ${escapeHtml(file.path)}</span>
+
+          <div class="actions">
+            <button onclick="openFile('${encodeURIComponent(file.path)}')">
+              Ouvrir
+            </button>
+
+            <button onclick="moveFile('${encodeURIComponent(file.path)}')">
+              Ranger
+            </button>
+          </div>
+        </div>
+      `).join("")}
     </div>
   `).join("");
 }
@@ -197,16 +205,6 @@ function openFile(encodedName) {
   window.open(url, "_blank");
 }
 
-async function createFolder() {
-  const name = prompt("Nom du nouveau dossier :");
-
-  if (!name) return;
-
-  alert(
-    "Pour créer réellement un dossier dans GitHub, GitHub demande une écriture dans le dépôt. " +
-    "Un dossier vide ne peut pas être créé seul : il sera créé au moment où tu déplaceras un fichier dedans."
-  );
-}
 
 async function moveFile(encodedName) {
   const name = decodeURIComponent(encodedName);
