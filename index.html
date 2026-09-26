@@ -313,6 +313,47 @@
     .dialog-actions button { min-height: 40px; padding: 0 13px; border: 1px solid var(--line); border-radius: 6px; background: white; cursor: pointer; font-size: 13px; font-weight: 650; }
     .dialog-actions .confirm { border-color: var(--green); color: white; background: var(--green); }
 
+
+    .project-bar {
+      display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+      margin-top:30px; padding:14px 16px; border:1px solid var(--line);
+      border-radius:9px; background:rgba(255,254,250,.78);
+    }
+    .project-status { flex:1; min-width:220px; color:var(--muted); font-size:13px; }
+    .project-status strong { color:var(--ink); }
+    .pdf-section { margin-top:44px; }
+    .pdf-head { display:flex; align-items:center; justify-content:space-between; gap:18px; margin-bottom:18px; }
+    .pdf-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; }
+    .pdf-card {
+      position:relative; display:flex; flex-direction:column; min-height:150px;
+      padding:18px; border:1px solid var(--line); border-radius:9px; background:var(--white);
+    }
+    .pdf-card .resource-icon { width:40px; height:40px; }
+    .pdf-name { margin:14px 0 5px; font-size:14px; font-weight:700; overflow-wrap:anywhere; }
+    .pdf-meta { margin:0; color:var(--muted); font-size:12px; }
+    .pdf-actions { display:flex; gap:8px; margin-top:auto; padding-top:14px; flex-wrap:wrap; }
+    .small-button {
+      min-height:36px; padding:0 11px; border:1px solid var(--line); border-radius:6px;
+      background:white; cursor:pointer; font-size:12px; font-weight:700;
+    }
+    .small-button:hover { border-color:var(--green); color:var(--green); }
+    .small-button.primary { color:white; border-color:var(--green); background:var(--green); }
+    .pdf-empty { grid-column:1/-1; }
+    .move-dialog { width:min(460px,calc(100% - 32px)); }
+    .folder-select { width:100%; height:44px; padding:0 10px; border:1px solid #cfd6ce; border-radius:6px; outline-color:var(--green); background:white; }
+    .viewer-dialog { width:min(1100px,calc(100% - 24px)); height:min(90vh,900px); padding:0; overflow:hidden; }
+    .viewer-dialog::backdrop { background:rgba(19,36,30,.62); }
+    .viewer-top { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 16px; border-bottom:1px solid var(--line); background:var(--white); }
+    .viewer-title { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:14px; font-weight:750; }
+    .viewer-close { min-height:34px; padding:0 10px; border:1px solid var(--line); border-radius:6px; background:white; cursor:pointer; }
+    #pdf-viewer { display:block; width:100%; height:calc(100% - 59px); border:0; background:#525659; }
+    @media (max-width:700px) {
+      .pdf-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+    }
+    @media (max-width:440px) {
+      .pdf-grid { grid-template-columns:1fr; }
+    }
+
     @keyframes appear { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
     @media (max-width: 700px) {
@@ -382,13 +423,20 @@
       <div class="folder-grid" id="folder-grid"></div>
     </section>
 
-    <a class="resource" href="creation-monitor_papier.pdf" id="course-resource">
-      <span class="resource-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></svg>
-      </span>
-      <span class="resource-copy"><strong>creation-monitor_papier.pdf</strong><span>Document de cours · 8 pages</span></span>
-      <span class="resource-link">Ouvrir ↗</span>
-    </a>
+    <div class="project-bar">
+      <button class="add-button" id="choose-project" type="button">Choisir la racine du projet</button>
+      <button class="small-button" id="refresh-pdfs" type="button" disabled>Actualiser</button>
+      <div class="project-status" id="project-status">Aucun dossier projet sélectionné.</div>
+    </div>
+
+    <section class="pdf-section" aria-labelledby="pdf-heading">
+      <div class="pdf-head">
+        <h2 id="pdf-heading">PDF disponibles <span class="folder-count" id="pdf-count"></span></h2>
+      </div>
+      <div class="pdf-grid" id="pdf-grid">
+        <div class="empty-state pdf-empty">Sélectionne la racine de ton projet pour afficher les PDF.</div>
+      </div>
+    </section>
   </main>
 
   <dialog id="folder-dialog" aria-labelledby="dialog-title">
@@ -404,6 +452,27 @@
     </form>
   </dialog>
 
+  <dialog class="move-dialog" id="move-dialog" aria-labelledby="move-title">
+    <form id="move-form" method="dialog">
+      <h2 id="move-title">Déplacer le PDF</h2>
+      <p id="move-description"></p>
+      <label class="field-label" for="move-folder">Dossier destination</label>
+      <select class="folder-select" id="move-folder" required></select>
+      <div class="dialog-actions">
+        <button type="button" id="cancel-move">Annuler</button>
+        <button class="confirm" type="submit">Déplacer</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="viewer-dialog" id="viewer-dialog" aria-labelledby="viewer-title">
+    <div class="viewer-top">
+      <div class="viewer-title" id="viewer-title">PDF</div>
+      <button class="viewer-close" id="close-viewer" type="button">Fermer</button>
+    </div>
+    <iframe id="pdf-viewer" title="Visualisation du PDF"></iframe>
+  </dialog>
+
   <script>
     const defaults = {
       courses: [{ id: "supports", name: "Supports de cours" }],
@@ -412,7 +481,8 @@
         { id: "exercices", name: "Exercices" }
       ]
     };
-    const storageKey = "espace-travail-folders-v1";
+
+    const storageKey = "espace-travail-folders-v2";
     const sections = {
       courses: {
         label: "Cours",
@@ -429,20 +499,33 @@
     let folders;
     try {
       const saved = JSON.parse(localStorage.getItem(storageKey));
-      folders = saved && Array.isArray(saved.courses) && Array.isArray(saved.revision) ? saved : structuredClone(defaults);
+      folders = saved && Array.isArray(saved.courses) && Array.isArray(saved.revision)
+        ? saved : structuredClone(defaults);
     } catch {
       folders = structuredClone(defaults);
     }
 
     let activeSection = "courses";
+    let projectRoot = null;
+    let currentPdfs = [];
+    let objectUrls = [];
+
     const trigger = document.querySelector("#menu-trigger");
     const menu = document.querySelector("#section-menu");
     const grid = document.querySelector("#folder-grid");
     const dialog = document.querySelector("#folder-dialog");
     const input = document.querySelector("#folder-name");
+    const pdfGrid = document.querySelector("#pdf-grid");
+    const chooseProject = document.querySelector("#choose-project");
+    const refreshPdfs = document.querySelector("#refresh-pdfs");
+    const projectStatus = document.querySelector("#project-status");
+    const moveDialog = document.querySelector("#move-dialog");
+    const moveFolder = document.querySelector("#move-folder");
+    const viewerDialog = document.querySelector("#viewer-dialog");
+    const viewer = document.querySelector("#pdf-viewer");
 
     function saveFolders() {
-      try { localStorage.setItem(storageKey, JSON.stringify(folders)); } catch { /* Storage can be unavailable in private browsing. */ }
+      try { localStorage.setItem(storageKey, JSON.stringify(folders)); } catch {}
     }
 
     function render() {
@@ -451,32 +534,187 @@
       document.querySelector("#menu-label").textContent = section.label;
       document.querySelector("#page-title").textContent = section.title;
       document.querySelector("#page-intro").textContent = section.intro;
-      document.querySelector("#folder-count").textContent = `${currentFolders.length} ${currentFolders.length === 1 ? "dossier" : "dossiers"}`;
-      document.querySelector("#course-resource").hidden = activeSection !== "courses";
+      document.querySelector("#folder-count").textContent =
+        `${currentFolders.length} ${currentFolders.length === 1 ? "dossier" : "dossiers"}`;
+
       document.querySelectorAll(".menu-option").forEach(option => {
         if (option.dataset.section === activeSection) option.setAttribute("aria-current", "page");
         else option.removeAttribute("aria-current");
       });
 
-      if (currentFolders.length === 0) {
+      if (!currentFolders.length) {
         grid.innerHTML = '<div class="empty-state">Aucun dossier ici pour le moment.</div>';
+      } else {
+        grid.innerHTML = currentFolders.map((folder, index) => `
+          <article class="folder-card" style="animation-delay:${index * 45}ms">
+            <span class="folder-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 7.5A1.5 1.5 0 0 1 5.5 6h4l2 2H18.5A1.5 1.5 0 0 1 20 9.5v8a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5z"/>
+                <path d="M4 10h16"/>
+              </svg>
+            </span>
+            <div><p class="folder-name"></p><p class="folder-meta">Dossier</p></div>
+            <button class="delete-folder" type="button" data-delete="${folder.id}" aria-label="Supprimer le dossier" title="Supprimer le dossier">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M3 6h18M8 6V4h8v2m3 0-1 14H6L5 6m4 4v6m6-6v6"/>
+              </svg>
+            </button>
+          </article>`).join("");
+
+        grid.querySelectorAll(".folder-card").forEach((card, index) => {
+          card.querySelector(".folder-name").textContent = currentFolders[index].name;
+        });
+      }
+      renderPdfs();
+    }
+
+    async function ensureFolder(folderName) {
+      if (!projectRoot) throw new Error("Aucune racine de projet.");
+      return await projectRoot.getDirectoryHandle(folderName, { create: true });
+    }
+
+    async function scanRootPdfs() {
+      if (!projectRoot) return [];
+      const pdfs = [];
+      for await (const [name, handle] of projectRoot.entries()) {
+        if (handle.kind === "file" && name.toLowerCase().endsWith(".pdf")) {
+          pdfs.push({ name, handle });
+        }
+      }
+      pdfs.sort((a, b) => a.name.localeCompare(b.name, "fr"));
+      return pdfs;
+    }
+
+    async function refreshPdfList() {
+      if (!projectRoot) return;
+      try {
+        currentPdfs = await scanRootPdfs();
+        renderPdfs();
+        projectStatus.innerHTML = `<strong>${escapeHtml(projectRoot.name)}</strong> · ${currentPdfs.length} PDF à la racine`;
+      } catch (error) {
+        projectStatus.textContent = "Impossible de lire ce dossier. Vérifie l'autorisation.";
+        console.error(error);
+      }
+    }
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, char => ({
+        "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#039;"
+      }[char]));
+    }
+
+    function renderPdfs() {
+      document.querySelector("#pdf-count").textContent =
+        `${currentPdfs.length} ${currentPdfs.length === 1 ? "PDF" : "PDFs"}`;
+
+      if (!projectRoot) {
+        pdfGrid.innerHTML = '<div class="empty-state pdf-empty">Sélectionne la racine de ton projet pour afficher les PDF.</div>';
         return;
       }
 
-      grid.innerHTML = currentFolders.map((folder, index) => `
-        <article class="folder-card" style="animation-delay:${index * 45}ms">
-          <span class="folder-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7.5A1.5 1.5 0 0 1 5.5 6h4l2 2H18.5A1.5 1.5 0 0 1 20 9.5v8a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5z"/><path d="M4 10h16"/></svg>
-          </span>
-          <div><p class="folder-name"></p><p class="folder-meta">Dossier</p></div>
-          <button class="delete-folder" type="button" data-delete="${folder.id}" aria-label="Supprimer le dossier" title="Supprimer le dossier">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2m3 0-1 14H6L5 6m4 4v6m6-6v6"/></svg>
-          </button>
-        </article>`).join("");
+      if (!currentPdfs.length) {
+        pdfGrid.innerHTML = '<div class="empty-state pdf-empty">Aucun PDF à la racine du projet.</div>';
+        return;
+      }
 
-      grid.querySelectorAll(".folder-card").forEach((card, index) => {
-        card.querySelector(".folder-name").textContent = currentFolders[index].name;
-      });
+      pdfGrid.innerHTML = currentPdfs.map((pdf, index) => `
+        <article class="pdf-card">
+          <span class="resource-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <path d="M14 2v6h6M8 13h8M8 17h5"/>
+            </svg>
+          </span>
+          <p class="pdf-name">${escapeHtml(pdf.name)}</p>
+          <p class="pdf-meta">PDF · racine du projet</p>
+          <div class="pdf-actions">
+            <button class="small-button primary" type="button" data-open-pdf="${index}">Visualiser</button>
+            <button class="small-button" type="button" data-move-pdf="${index}">Déplacer</button>
+          </div>
+        </article>`).join("");
+    }
+
+    async function chooseProjectFolder() {
+      if (!window.showDirectoryPicker) {
+        alert("Cette fonction nécessite Chrome ou Edge récent (File System Access API).");
+        return;
+      }
+      try {
+        const handle = await window.showDirectoryPicker({ mode: "readwrite" });
+        projectRoot = handle;
+        refreshPdfs.disabled = false;
+        projectStatus.innerHTML = `<strong>${escapeHtml(handle.name)}</strong> · accès en lecture/écriture accordé`;
+        await refreshPdfList();
+      } catch (error) {
+        if (error.name !== "AbortError") {
+          console.error(error);
+          alert("Le dossier n'a pas pu être ouvert.");
+        }
+      }
+    }
+
+    async function openPdf(index) {
+      const pdf = currentPdfs[index];
+      if (!pdf) return;
+      try {
+        const file = await pdf.handle.getFile();
+        objectUrls.forEach(url => URL.revokeObjectURL(url));
+        objectUrls = [];
+        const url = URL.createObjectURL(file);
+        objectUrls.push(url);
+        viewer.src = url;
+        document.querySelector("#viewer-title").textContent = pdf.name;
+        viewerDialog.showModal();
+      } catch (error) {
+        console.error(error);
+        alert("Impossible d'ouvrir ce PDF.");
+      }
+    }
+
+    function openMoveDialog(index) {
+      const pdf = currentPdfs[index];
+      if (!pdf) return;
+      moveFolder.innerHTML = folders[activeSection].map(folder =>
+        `<option value="${escapeHtml(folder.name)}">${escapeHtml(folder.name)}</option>`
+      ).join("");
+
+      if (!folders[activeSection].length) {
+        alert("Crée d'abord au moins un dossier.");
+        return;
+      }
+
+      moveDialog.dataset.pdfIndex = String(index);
+      document.querySelector("#move-description").textContent =
+        `Choisis le dossier dans lequel déplacer « ${pdf.name} ».`;
+      moveDialog.showModal();
+    }
+
+    async function movePdf(index, destinationName) {
+      const pdf = currentPdfs[index];
+      if (!pdf || !projectRoot) return;
+
+      try {
+        const destination = await ensureFolder(destinationName);
+        const sourceFile = await pdf.handle.getFile();
+        const target = await destination.getFileHandle(pdf.name, { create: true });
+
+        // Évite d'écraser silencieusement un fichier du même nom.
+        try {
+          await target.getFile();
+          const overwrite = confirm(`« ${pdf.name} » existe déjà dans « ${destinationName} ». Le remplacer ?`);
+          if (!overwrite) return;
+        } catch {}
+
+        const writable = await target.createWritable();
+        await writable.write(await sourceFile.arrayBuffer());
+        await writable.close();
+
+        await projectRoot.removeEntry(pdf.name);
+        await refreshPdfList();
+      } catch (error) {
+        console.error(error);
+        alert("Le déplacement a échoué. Vérifie que le dossier autorise bien l'écriture.");
+      }
     }
 
     trigger.addEventListener("click", () => {
@@ -510,8 +748,9 @@
       }
     });
 
-    document.querySelector("#add-folder").addEventListener("click", () => {
-      document.querySelector("#dialog-description").textContent = `Ajoute un dossier à ${sections[activeSection].label.toLowerCase()}.`;
+    document.querySelector("#add-folder").addEventListener("click", async () => {
+      document.querySelector("#dialog-description").textContent =
+        `Ajoute un dossier à ${sections[activeSection].label.toLowerCase()}.`;
       input.value = "";
       dialog.showModal();
       input.focus();
@@ -519,24 +758,99 @@
 
     document.querySelector("#cancel-dialog").addEventListener("click", () => dialog.close());
 
-    document.querySelector("#folder-form").addEventListener("submit", event => {
+    document.querySelector("#folder-form").addEventListener("submit", async event => {
       event.preventDefault();
       const name = input.value.trim();
       if (!name) return;
+
+      // Le dossier est enregistré dans l'interface et, si la racine est ouverte,
+      // il est aussi créé physiquement dans le projet.
+      if (projectRoot) {
+        try {
+          await ensureFolder(name);
+        } catch (error) {
+          console.error(error);
+          alert("Impossible de créer le dossier dans le projet.");
+          return;
+        }
+      }
+
       folders[activeSection].push({ id: crypto.randomUUID(), name });
       saveFolders();
       dialog.close();
       render();
+      await refreshPdfList();
       document.querySelector("#add-folder").focus();
     });
 
-    grid.addEventListener("click", event => {
+    grid.addEventListener("click", async event => {
       const button = event.target.closest("[data-delete]");
       if (!button) return;
+
+      const folder = folders[activeSection].find(f => f.id === button.dataset.delete);
+      if (!folder) return;
+
+      if (projectRoot) {
+        const confirmed = confirm(
+          `Supprimer « ${folder.name} » de l'interface et tenter de supprimer le dossier vide du projet ?`
+        );
+        if (!confirmed) return;
+        try {
+          await projectRoot.removeEntry(folder.name, { recursive: false });
+        } catch (error) {
+          // Le dossier peut contenir des fichiers : on ne supprime jamais son contenu automatiquement.
+          if (error.name !== "NotFoundError") {
+            alert("Le dossier contient probablement des fichiers et n'a pas été supprimé du disque. Il sera retiré de l'interface.");
+          }
+        }
+      }
+
       folders[activeSection] = folders[activeSection].filter(folder => folder.id !== button.dataset.delete);
       saveFolders();
       render();
     });
+
+    pdfGrid.addEventListener("click", event => {
+      const openButton = event.target.closest("[data-open-pdf]");
+      if (openButton) {
+        openPdf(Number(openButton.dataset.openPdf));
+        return;
+      }
+
+      const moveButton = event.target.closest("[data-move-pdf]");
+      if (moveButton) openMoveDialog(Number(moveButton.dataset.movePdf));
+    });
+
+    document.querySelector("#folder-form").addEventListener("keydown", event => {
+      if (event.key === "Escape") dialog.close();
+    });
+
+    document.querySelector("#cancel-move").addEventListener("click", () => moveDialog.close());
+
+    document.querySelector("#move-form").addEventListener("submit", async event => {
+      event.preventDefault();
+      const index = Number(moveDialog.dataset.pdfIndex);
+      const destination = moveFolder.value;
+      moveDialog.close();
+      await movePdf(index, destination);
+    });
+
+    document.querySelector("#close-viewer").addEventListener("click", () => {
+      viewerDialog.close();
+      viewer.src = "";
+    });
+
+    viewerDialog.addEventListener("close", () => {
+      viewer.src = "";
+    });
+
+    chooseProject.addEventListener("click", chooseProjectFolder);
+    refreshPdfs.addEventListener("click", refreshPdfList);
+
+    if (!window.showDirectoryPicker) {
+      projectStatus.innerHTML = "Navigateur non compatible : utilise <strong>Chrome ou Edge</strong> récent.";
+      chooseProject.disabled = true;
+    }
 
     render();
   </script>
